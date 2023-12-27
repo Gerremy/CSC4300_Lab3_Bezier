@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<title>Bezier Curves</title>
+
+<script>
+    var canvas;    // DOM object corresponding to the canvas
+    var graphics;  // 2D graphics context for drawing on the canvas
+
+    // Return the point on the Bezier line with control points p0 and p1
+    function linearBezierPoint(t, p0, p1) {
+        var x = (1-t)*p0[0] + t*p1[0];
+        var y = (1-t)*p0[1] + t*p1[1];
+        return [x, y];
+    }
+
+    // Return a list of n+1 points on the Bezier line between p0 and p1 (inclusive)
+    function linearBezierList(p0, p1, n) {
+        var list = [];
+
+        // compute n+1 points on the line at offsets 0, 1/n, 2/n, ..., 1 from p0
+        for (var i = 0; i <= n; i++) {
+            var t = i / n;                          // current offset
+            var p = linearBezierPoint(t,p0,p1);     // compute point at offset t
+            list.push(p);                          // add point to list
+        }
+        return list;
+    }
+
+    // Draw a Bezier curve defined by a list of points
+    function drawBezier(list) {
+
+        graphics.beginPath();   // start the path
+        var p = list[0];       // first point on the path
+
+        // put the pen down 
+        graphics.moveTo(p[0], p[1]);
+        for(var i = 1; i < list.length; i++)
+        {
+    
+        // TO DO: use lineTo point with index i
+        var p = list[i];
+        graphics.lineTo(p[0], p[1]);
+
+        }
+        // this is what actually draws the line
+        graphics.stroke();
+    }
+
+
+    // Return the point on the Bezier curve with control points p0,p1,p2
+    function quadBezierPoint(t, p0, p1, p2) {
+
+    // TODO: use calls to linearBezierPoint here
+        var q0 = linearBezierPoint(t, p0, p1);
+        var q1 = linearBezierPoint(t, p1, p2);
+        var p = linearBezierPoint(t, q0, q1);
+        return p;
+
+    }
+
+    // Return a list of n+1 points on the quadratic Bezier curve
+    function quadBezierList(p0, p1, p2, n) {
+ 
+    // TODO: similar to linearBezierList, but uses calls to quadBezierPoint
+        var list = [];
+
+        for (var i = 0; i <= n; i++) {
+            var t = (i/n);
+            var p = quadBezierPoint(t, p0, p1, p2);
+            list.push(p);
+        }
+
+        return list;
+    }
+
+    // Return the point on the Bezier curve with control points p0,p1,p2,p3
+    function cubicBezierPoint(t, p0, p1, p2, p3) {
+
+    // TODO: use calls to quadBezierPoint and linearBezierPoint here
+        var r0 = quadBezierPoint(t, p0, p1, p2);
+        var r1 = quadBezierPoint(t, p1, p2, p3);
+        var p = linearBezierPoint(t, r0, r1);
+        return p;
+
+    }
+
+    // Return a list of n+1 points on the cubic Bezier curve
+    function cubicBezierList(p0, p1, p2, p3, n) {
+
+    // TODO: similar to linearBezierList, but uses calls to cubicBezierPoint
+        var list = [];
+
+        for (var i = 0; i <= n; i++) {
+            var t = (i/n);
+            var p = cubicBezierPoint(t, p0, p1, p2, p3);
+            list.push(p);
+        }
+
+        return list;
+
+    }
+
+    function draw() {
+
+        // set up control points
+        var p0 = [200, 110];
+        var p1 = [200, 300];
+
+        var r1 = [30, 50];
+
+        var q1 = [300,50];
+        var q2 = [330,140];
+
+        // Compute the list of points along the Bezier curve
+        list1 = linearBezierList(p0, p1, 20);
+        // Draw a curve passing through the points in the list
+        drawBezier(list1);        
+
+        list2 = quadBezierList(p0, r1, p1, 100);
+        drawBezier(list2);
+
+        list3 = cubicBezierList(p0, q1, q2, p1, 100);
+        drawBezier(list3);        
+
+        // Notice the difference between the quadratic and cubic curves 
+    }
+
+    function main() {
+        canvas = document.getElementById("myCanvas");
+        graphics = canvas.getContext("2d");
+        draw();  // draw something on the canvas
+    }
+</script>
+
+
+</head>
+<body onload="main()">
+    <canvas id="myCanvas" width="400" height="400" style="border: 1px solid lightgrey"></canvas>
+</body>
+</html>
